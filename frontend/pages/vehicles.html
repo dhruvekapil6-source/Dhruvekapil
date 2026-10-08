@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Management - Fleet System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-truck"></i> Fleet Manager</h3>
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="vehicles.html" class="active"><i class="fas fa-car"></i> Vehicles</a></li>
+                <li><a href="drivers.html"><i class="fas fa-user-tie"></i> Drivers</a></li>
+                <li><a href="trips.html"><i class="fas fa-map-location-dot"></i> Trips</a></li>
+                <li><a href="routes.html"><i class="fas fa-route"></i> Routes</a></li>
+                <li><a href="fuel.html"><i class="fas fa-gas-pump"></i> Fuel</a></li>
+                <li><a href="maintenance.html"><i class="fas fa-wrench"></i> Maintenance</a></li>
+                <li><a href="reports.html"><i class="fas fa-file-pdf"></i> Reports</a></li>
+                <li><a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="profile.html"><i class="fas fa-user-circle"></i> Profile</a>
+                <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navbar -->
+            <nav class="top-navbar">
+                <div class="navbar-left">
+                    <button class="toggle-sidebar" id="toggle-sidebar" type="button" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
+                    <h2>Vehicle Management</h2>
+                </div>
+                <div class="navbar-right">
+                </div>
+            </nav>
+
+            <!-- Page Content -->
+            <div class="container-fluid p-4">
+                <section class="vehicle-intro">
+                    <div>
+                        <p class="eyebrow">Fleet assets</p>
+                        <h1>Vehicle Management</h1>
+                        <p class="intro-copy">Track inventory, availability, and document health across your fleet.</p>
+                    </div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVehicleModal" id="new-vehicle-button">
+                        <i class="fas fa-plus" aria-hidden="true"></i> Add vehicle
+                    </button>
+                </section>
+
+                <div class="row vehicle-summary" aria-label="Fleet summary">
+                    <div class="col-sm-6 col-xl-3"><div class="vehicle-metric"><span>Total fleet</span><strong id="vehicle-count-total">0</strong><small>Registered vehicles</small></div></div>
+                    <div class="col-sm-6 col-xl-3"><div class="vehicle-metric"><span>Available</span><strong id="vehicle-count-active">0</strong><small>Active status</small></div></div>
+                    <div class="col-sm-6 col-xl-3"><div class="vehicle-metric"><span>In maintenance</span><strong id="vehicle-count-maintenance">0</strong><small>Currently unavailable</small></div></div>
+                    <div class="col-sm-6 col-xl-3"><div class="vehicle-metric vehicle-metric-attention"><span>Needs attention</span><strong id="vehicle-count-attention">0</strong><small>Fleet status or documents</small></div></div>
+                </div>
+
+                <div class="vehicle-workspace">
+                    <div class="vehicle-toolbar">
+                        <div class="vehicle-tabs" role="tablist" aria-label="Vehicle views">
+                            <button class="vehicle-tab active" id="inventory-tab" type="button" role="tab" aria-selected="true" aria-controls="inventory-panel" data-view="inventory">Inventory</button>
+                            <button class="vehicle-tab" id="health-tab" type="button" role="tab" aria-selected="false" aria-controls="health-panel" data-view="health">Vehicle health</button>
+                        </div>
+                        <div class="vehicle-filters" id="inventory-filters">
+                            <label class="visually-hidden" for="vehicle-search">Search vehicles</label>
+                            <input type="search" id="vehicle-search" class="form-control form-control-sm vehicle-search" placeholder="Search fleet...">
+                            <label class="visually-hidden" for="inventory-type-filter">Filter by vehicle type</label>
+                            <select class="form-select form-select-sm" id="inventory-type-filter"><option value="all">All types</option></select>
+                            <label class="visually-hidden" for="inventory-status-filter">Filter by status</label>
+                            <select class="form-select form-select-sm" id="inventory-status-filter">
+                                <option value="all">All statuses</option>
+                                <option value="active">Active</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="retired">Retired</option>
+                            </select>
+                            <button class="btn btn-light btn-sm vehicle-export" id="export-vehicles" type="button" title="Export current vehicles as CSV" aria-label="Export vehicles as CSV"><i class="fas fa-download" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+
+                    <section class="vehicle-panel" id="inventory-panel" role="tabpanel" aria-labelledby="inventory-tab">
+                        <div class="vehicle-panel-heading"><div><h2>Fleet inventory</h2><p id="inventory-result-count">Loading vehicles...</p></div></div>
+                        <div class="table-responsive">
+                            <table class="table table-hover vehicle-table">
+                                <thead><tr><th>Vehicle</th><th>Type</th><th>Registration</th><th>Status</th><th>Location</th><th>Odometer</th><th>Actions</th></tr></thead>
+                                <tbody id="vehicles-table"><tr><td colspan="7" class="text-center">Loading vehicles...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section class="vehicle-panel" id="health-panel" role="tabpanel" aria-labelledby="health-tab" hidden>
+                        <div class="vehicle-panel-heading"><div><h2>Vehicle health</h2><p>Operational status and registration compliance based on recorded fleet data.</p></div></div>
+                        <div id="health-summary" class="health-summary"></div>
+                        <div class="table-responsive">
+                            <table class="table table-hover vehicle-table">
+                                <thead><tr><th>Vehicle</th><th>Fleet status</th><th>Insurance</th><th>Registration</th><th>Odometer</th><th>Health signal</th></tr></thead>
+                                <tbody id="vehicle-health-table"><tr><td colspan="6" class="text-center">Loading vehicle health...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Vehicle Modal -->
+    <div class="modal fade" id="addVehicleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Vehicle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addVehicleForm">
+                        <div class="mb-3">
+                            <label for="vehicleNumber" class="form-label">Vehicle Number</label>
+                            <input type="text" class="form-control" id="vehicleNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="vehicleType" class="form-label">Vehicle Type</label>
+                            <select class="form-select" id="vehicleType" required>
+                                <option value="">Select Type</option>
+                                <option value="car">Car</option>
+                                <option value="truck">Truck</option>
+                                <option value="van">Van</option>
+                                <option value="bus">Bus</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registrationNumber" class="form-label">Registration Number</label>
+                            <input type="text" class="form-control" id="registrationNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="purchaseDate" class="form-label">Purchase Date</label>
+                            <input type="date" class="form-control" id="purchaseDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="vehicleStatus" class="form-label">Status</label>
+                            <select class="form-select" id="vehicleStatus" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="maintenance">Under maintenance</option>
+                                <option value="retired">Retired</option>
+                            </select>
+                        </div>
+                        <div class="mb-3"><label for="insuranceExpiry" class="form-label">Insurance expiry</label><input type="date" class="form-control" id="insuranceExpiry"></div>
+                        <div class="mb-3"><label for="registrationExpiry" class="form-label">Registration expiry</label><input type="date" class="form-control" id="registrationExpiry"></div>
+                        <div class="mb-3"><label for="currentLocation" class="form-label">Current location</label><input type="text" class="form-control" id="currentLocation"></div>
+                        <div class="mb-3"><label for="totalDistance" class="form-label">Odometer (km)</label><input type="number" min="0" step="any" class="form-control" id="totalDistance" value="0"></div>
+                        <div class="mb-3"><label for="vehicleLatitude" class="form-label">Latitude</label><input type="number" min="-90" max="90" step="any" class="form-control" id="vehicleLatitude"></div>
+                        <div class="mb-3"><label for="vehicleLongitude" class="form-label">Longitude</label><input type="number" min="-180" max="180" step="any" class="form-control" id="vehicleLongitude"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" form="addVehicleForm" id="save-vehicle-button">Add Vehicle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api-client.js"></script>
+    <script src="../js/vehicles.js"></script>
+</body>
+</html>
